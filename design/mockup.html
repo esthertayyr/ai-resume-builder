@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Career Adventure — UI Mockup (for rebrand reference)</title>
+
+  <!--
+    STATIC MOCKUP of the "Career Adventure" AI Resume Builder.
+    This single file mirrors the live app (which is built in Next.js + React + Tailwind)
+    so it can be handed to a design tool / ChatGPT for a REBRAND.
+
+    HOW THE REAL APP MAPS TO THIS FILE:
+      • Colours + fonts + shadows below  ->  tailwind.config.ts  (change these to rebrand everything)
+      • "Landing" screen                 ->  app/page.tsx
+      • "Choose your path" screen         ->  app/start/page.tsx
+      • "Resume builder" screen           ->  app/preview/page.tsx
+      • Career Journey rail               ->  components/progress/CareerJourney.tsx
+
+    To rebrand: edit the `theme.extend.colors` and `fontFamily` in the <script> config
+    block below (and the Google Fonts <link>). Those token names (accent, navy, mint…)
+    are the SAME names used throughout the real components, so a palette change here
+    translates 1:1 back into the app.
+  -->
+
+  <!-- Fonts (same as the app: Sora display, Inter body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@400;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind via CDN, configured with the app's real design tokens -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            canvas: "#F7F8FC", // primary background
+            navy:   "#172033", // dark text / headings
+            accent: "#635BFF", // primary accent (indigo)
+            sky:    "#4F9CF9", // secondary blue
+            mint:   "#62D5B0", // success / "that counts"
+            sun:    "#FFC857", // warm yellow
+            coral:  "#FF7A7A", // alerts
+            muted:  "#5B6478", // secondary text
+            hair:   "#E6E9F2", // hairline borders
+            card:   "#FFFFFF",
+          },
+          fontFamily: {
+            display: ['"Sora"', '"Space Grotesk"', "ui-sans-serif", "system-ui", "sans-serif"],
+            sans:    ['"Inter"', "ui-sans-serif", "system-ui", "sans-serif"],
+          },
+          boxShadow: {
+            soft: "0 1px 2px rgba(23,32,51,0.04), 0 8px 24px -12px rgba(23,32,51,0.12)",
+            lift: "0 2px 4px rgba(23,32,51,0.05), 0 18px 40px -16px rgba(23,32,51,0.20)",
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body { font-family: "Inter", ui-sans-serif, system-ui, sans-serif; }
+    .font-display { font-family: "Sora", "Space Grotesk", ui-sans-serif, system-ui, sans-serif; }
+    /* Label separating each mocked screen — not part of the real UI */
+    .screen-label {
+      font: 600 11px/1 "Inter", sans-serif; letter-spacing: .18em; text-transform: uppercase;
+      color: #5B6478; background: #E6E9F2; padding: 6px 14px; border-radius: 999px;
+    }
+  </style>
+</head>
+
+<body class="bg-canvas text-navy">
+
+<!-- =================================================================== -->
+<!-- SCREEN 1 — LANDING  (app/page.tsx)                                  -->
+<!-- =================================================================== -->
+<div class="mx-auto max-w-6xl px-6 pt-10"><span class="screen-label">Screen 1 · Landing</span></div>
+<main class="mx-auto max-w-5xl px-6">
+
+  <!-- Cinematic opening -->
+  <section class="flex min-h-[70vh] flex-col justify-center py-16">
+    <div class="font-display text-6xl font-extrabold leading-[0.95] tracking-tight text-navy sm:text-8xl">
+      <span class="block">YOU</span>
+      <span class="block">HAVE</span>
+      <span class="block text-accent">EXPERIENCE.</span>
+    </div>
+    <p class="mt-8 max-w-xl text-xl text-muted">
+      You have more experience than you think. Let&rsquo;s discover what you&rsquo;ve got.
+    </p>
+    <div class="mt-10 flex flex-col gap-4 sm:flex-row">
+      <a href="#" class="inline-flex items-center justify-center rounded-full bg-accent px-7 py-3.5 text-base font-semibold text-white shadow-soft hover:brightness-105">Build My Resume</a>
+      <a href="#" class="inline-flex items-center justify-center rounded-full border border-hair bg-white px-7 py-3.5 text-base font-semibold text-navy hover:border-accent/50">I Already Have a Resume</a>
+    </div>
+  </section>
+
+  <!-- "That counts" -->
+  <section class="border-t border-hair py-16">
+    <div class="grid gap-6 sm:grid-cols-3">
+      <div class="rounded-2xl bg-white p-6 shadow-soft">
+        <p class="text-lg text-muted">&ldquo;I only worked at a caf&eacute;.&rdquo;</p>
+        <p class="mt-3 font-display text-2xl font-bold text-navy">THAT <span class="text-mint">COUNTS.</span></p>
+      </div>
+      <div class="rounded-2xl bg-white p-6 shadow-soft">
+        <p class="text-lg text-muted">&ldquo;I only helped my family&rsquo;s business.&rdquo;</p>
+        <p class="mt-3 font-display text-2xl font-bold text-navy">THAT <span class="text-mint">COUNTS.</span></p>
+      </div>
+      <div class="rounded-2xl bg-white p-6 shadow-soft">
+        <p class="text-lg text-muted">&ldquo;I only ran my club&rsquo;s Instagram.&rdquo;</p>
+        <p class="mt-3 font-display text-2xl font-bold text-navy">THAT <span class="text-mint">COUNTS.</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI discovers responsibilities -->
+  <section class="border-t border-hair py-16">
+    <h2 class="font-display text-3xl font-bold text-navy sm:text-4xl">Tell us once. We&rsquo;ll help you unpack it.</h2>
+    <p class="mt-3 max-w-xl text-muted">Say &ldquo;I worked as a cashier&rdquo; and we suggest what people commonly do &mdash; you pick only what you actually did.</p>
+    <div class="mt-8 grid gap-6 md:grid-cols-2">
+      <div class="rounded-2xl bg-white p-6 shadow-soft">
+        <p class="mb-3 inline-block rounded-full bg-sky/10 px-3 py-1 text-xs font-medium text-sky">These are suggestions</p>
+        <ul class="space-y-2 text-navy">
+          <li class="flex items-center gap-3 rounded-lg border border-hair px-3 py-2"><span class="h-4 w-4 rounded border border-hair"></span>Customer service</li>
+          <li class="flex items-center gap-3 rounded-lg border border-hair px-3 py-2"><span class="h-4 w-4 rounded border border-hair"></span>Handled payments</li>
+          <li class="flex items-center gap-3 rounded-lg border border-hair px-3 py-2"><span class="h-4 w-4 rounded border border-hair"></span>Restocked products</li>
+          <li class="flex items-center gap-3 rounded-lg border border-hair px-3 py-2"><span class="h-4 w-4 rounded border border-hair"></span>Worked during busy periods</li>
+        </ul>
+      </div>
+      <div class="flex flex-col justify-center rounded-2xl bg-navy p-6 text-white">
+        <p class="text-sm text-white/60">&#10024; 3 skills discovered</p>
+        <div class="mt-3 flex flex-wrap gap-2">
+          <span class="rounded-full bg-white/10 px-3 py-1.5 text-sm">Customer Service</span>
+          <span class="rounded-full bg-white/10 px-3 py-1.5 text-sm">Cash Handling</span>
+          <span class="rounded-full bg-white/10 px-3 py-1.5 text-sm">Teamwork</span>
+        </div>
+        <p class="mt-4 text-sm text-white/70">Discovered from what you told us &mdash; never invented.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Career Journey rail -->
+  <section class="border-t border-hair py-16">
+    <div class="rounded-3xl bg-white p-8 shadow-soft">
+      <p class="mb-4 text-center text-xs font-semibold uppercase tracking-[0.22em] text-muted">Your Career Journey</p>
+      <ol class="flex items-center justify-between">
+        <li class="flex flex-1 items-center">
+          <div class="flex flex-col items-center gap-2">
+            <span class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-mint bg-mint text-sm font-semibold text-white">&check;</span>
+            <span class="text-[11px] font-medium text-navy sm:text-xs">About You</span>
+          </div>
+          <span class="mx-1 h-0.5 flex-1 rounded bg-mint"></span>
+        </li>
+        <li class="flex flex-1 items-center">
+          <div class="flex flex-col items-center gap-2">
+            <span class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-accent bg-accent/10 text-sm font-semibold text-accent">2</span>
+            <span class="text-[11px] font-medium text-navy sm:text-xs">Experience</span>
+          </div>
+          <span class="mx-1 h-0.5 flex-1 rounded bg-hair"></span>
+        </li>
+        <li class="flex flex-1 items-center">
+          <div class="flex flex-col items-center gap-2">
+            <span class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-hair bg-white text-sm font-semibold text-muted">3</span>
+            <span class="text-[11px] font-medium text-muted sm:text-xs">Skills</span>
+          </div>
+          <span class="mx-1 h-0.5 flex-1 rounded bg-hair"></span>
+        </li>
+        <li class="flex flex-1 items-center">
+          <div class="flex flex-col items-center gap-2">
+            <span class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-hair bg-white text-sm font-semibold text-muted">4</span>
+            <span class="text-[11px] font-medium text-muted sm:text-xs">Career Story</span>
+          </div>
+          <span class="mx-1 h-0.5 flex-1 rounded bg-hair"></span>
+        </li>
+        <li class="flex items-center">
+          <div class="flex flex-col items-center gap-2">
+            <span class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-hair bg-white text-sm font-semibold text-muted">5</span>
+            <span class="text-[11px] font-medium text-muted sm:text-xs">Resume Ready</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="border-t border-hair py-20 text-center">
+    <h2 class="font-display text-4xl font-extrabold leading-tight text-navy sm:text-5xl">
+      Come in. We&rsquo;ll help you <span class="text-accent">figure this out.</span>
+    </h2>
+    <div class="mt-8 flex justify-center">
+      <a href="#" class="inline-flex items-center justify-center rounded-full bg-accent px-7 py-3.5 text-base font-semibold text-white shadow-soft hover:brightness-105">Build My Resume</a>
+    </div>
+    <p class="mt-6 text-sm text-muted">No account needed to start. Your progress saves automatically.</p>
+  </section>
+</main>
+
+<!-- =================================================================== -->
+<!-- SCREEN 2 — CHOOSE YOUR PATH  (app/start/page.tsx)                   -->
+<!-- =================================================================== -->
+<div class="mx-auto max-w-6xl px-6 pt-16"><span class="screen-label">Screen 2 · Choose your path</span></div>
+<main class="mx-auto flex max-w-5xl flex-col justify-center px-6 py-12">
+  <div class="text-center">
+    <h1 class="font-display text-3xl font-bold tracking-tight text-navy sm:text-5xl">How much help do you want?</h1>
+    <p class="mt-3 text-muted">This is about guidance &mdash; not a ranking. Every path leads to a great resume.</p>
+  </div>
+  <div class="mt-12 grid gap-5 md:grid-cols-3">
+    <button class="group flex flex-col rounded-3xl border border-hair bg-white p-7 text-left shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift">
+      <span class="text-4xl">&#127793;</span>
+      <span class="mt-5 text-sm font-semibold uppercase tracking-[0.15em] text-accent">STARTING OUT</span>
+      <span class="mt-2 flex-1 text-navy">I&rsquo;ve never made a resume before.</span>
+      <span class="mt-6 inline-flex items-center gap-2 font-semibold text-accent">Guide me <span class="transition-transform group-hover:translate-x-1">&rarr;</span></span>
+    </button>
+    <button class="group flex flex-col rounded-3xl border border-hair bg-white p-7 text-left shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift">
+      <span class="text-4xl">&#127807;</span>
+      <span class="mt-5 text-sm font-semibold uppercase tracking-[0.15em] text-accent">SOME EXPERIENCE</span>
+      <span class="mt-2 flex-1 text-navy">I&rsquo;ve worked, studied, volunteered or done projects.</span>
+      <span class="mt-6 inline-flex items-center gap-2 font-semibold text-accent">Help me build it <span class="transition-transform group-hover:translate-x-1">&rarr;</span></span>
+    </button>
+    <button class="group flex flex-col rounded-3xl border border-accent/50 bg-white p-7 text-left shadow-soft ring-2 ring-accent/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-lift">
+      <span class="text-4xl">&#128640;</span>
+      <span class="mt-5 text-sm font-semibold uppercase tracking-[0.15em] text-accent">I KNOW MY STUFF</span>
+      <span class="mt-2 flex-1 text-navy">I already know my experience. I want to move quickly.</span>
+      <span class="mt-6 inline-flex items-center gap-2 font-semibold text-accent">Let&rsquo;s go <span class="transition-transform group-hover:translate-x-1">&rarr;</span></span>
+    </button>
+  </div>
+  <p class="mt-10 text-center text-sm text-muted">You can change this anytime.</p>
+</main>
+
+<!-- =================================================================== -->
+<!-- SCREEN 3 — RESUME BUILDER  (app/preview/page.tsx)                   -->
+<!-- =================================================================== -->
+<div class="mx-auto max-w-6xl px-6 pt-16"><span class="screen-label">Screen 3 · Resume builder + preview</span></div>
+<main class="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 py-8 lg:grid-cols-[380px_1fr]">
+
+  <!-- Left control rail -->
+  <aside class="order-2 space-y-5 lg:order-1">
+    <div>
+      <a href="#" class="text-sm text-muted hover:text-navy">&larr; Return to the coach</a>
+      <h1 class="mt-2 font-display text-2xl font-bold text-navy">Your resume</h1>
+      <p class="mt-1 text-sm text-muted">Profile strength: <span class="font-semibold text-accent">Strong</span> &middot; 80%</p>
+    </div>
+
+    <!-- Completion banner ("LOOK WHAT YOU BUILT") -->
+    <div class="overflow-hidden rounded-2xl border border-hair bg-gradient-to-br from-accent/10 via-white to-mint/10 p-5">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-accent">Look what you built</p>
+      <p class="mt-1 font-display text-xl font-bold text-navy">This is your resume &mdash; from what you&rsquo;ve actually done.</p>
+      <div class="mt-4 flex flex-wrap gap-x-6 gap-y-2">
+        <div><span class="font-display text-2xl font-bold text-navy">2</span> <span class="text-sm text-muted">experiences</span></div>
+        <div><span class="font-display text-2xl font-bold text-navy">6</span> <span class="text-sm text-muted">responsibilities</span></div>
+        <div><span class="font-display text-2xl font-bold text-navy">3</span> <span class="text-sm text-muted">achievements</span></div>
+        <div><span class="font-display text-2xl font-bold text-navy">5</span> <span class="text-sm text-muted">skills</span></div>
+      </div>
+    </div>
+
+    <!-- Panel: summary -->
+    <div class="rounded-2xl border border-hair bg-white p-4 shadow-soft">
+      <p class="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted">Professional summary</p>
+      <textarea rows="4" class="w-full resize-none rounded-lg border border-hair bg-white px-3 py-2 text-sm text-navy focus:border-accent focus:outline-none">Reliable café team member with hands-on customer service and cash-handling experience, known for staying calm during busy periods.</textarea>
+      <p class="mt-1 text-xs text-muted">AI-suggested, confirmed by you</p>
+    </div>
+
+    <!-- Panel: skills -->
+    <div class="rounded-2xl border border-hair bg-white p-4 shadow-soft">
+      <p class="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted">Skills</p>
+      <p class="rounded bg-sky/10 px-2 py-1.5 text-xs font-medium text-sky">&#10024; We found some skills in what you told us. Confirm the ones that fit.</p>
+      <div class="mt-2 space-y-2">
+        <button class="w-full rounded-lg border border-accent bg-accent/10 px-3 py-2 text-left text-sm text-navy">Customer Service<span class="mt-0.5 block text-xs text-muted">from &ldquo;served customers&rdquo;</span></button>
+        <button class="w-full rounded-lg border border-hair px-3 py-2 text-left text-sm text-navy">Cash Handling<span class="mt-0.5 block text-xs text-muted">from &ldquo;handled payments&rdquo;</span></button>
+      </div>
+    </div>
+
+    <!-- Panel: achievements -->
+    <div class="rounded-2xl border border-hair bg-white p-4 shadow-soft">
+      <p class="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted">Achievements</p>
+      <p class="mb-3 text-xs text-muted">A few quick questions. Anything you confirm is added to your most recent experience.</p>
+      <p class="text-xs text-muted">Question 1 of 6. We won&rsquo;t invent anything &mdash; this only uses what you tell us.</p>
+      <p class="mt-2 text-sm font-medium text-navy">Did you ever solve a difficult problem?</p>
+      <div class="mt-2 flex gap-2">
+        <button class="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white">Yes</button>
+        <button class="rounded-full border border-hair bg-white px-4 py-2 text-sm font-medium text-muted">Not really</button>
+      </div>
+    </div>
+
+    <!-- Panel: template -->
+    <div class="rounded-2xl border border-hair bg-white p-4 shadow-soft">
+      <p class="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted">Template</p>
+      <div class="grid grid-cols-3 gap-2">
+        <button class="rounded-lg border border-accent bg-accent/10 px-2 py-2 text-xs text-navy">Clean</button>
+        <button class="rounded-lg border border-hair px-2 py-2 text-xs text-muted">Modern</button>
+        <button class="rounded-lg border border-hair px-2 py-2 text-xs text-muted">Executive</button>
+      </div>
+      <div class="mt-3 flex gap-2">
+        <button class="rounded-lg border border-accent bg-accent/10 px-3 py-1.5 text-xs text-navy">A4</button>
+        <button class="rounded-lg border border-hair px-3 py-1.5 text-xs text-muted">Letter</button>
+      </div>
+    </div>
+
+    <!-- Panel: download -->
+    <div class="rounded-2xl border border-hair bg-white p-4 shadow-soft">
+      <p class="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-muted">Download</p>
+      <div class="flex gap-2">
+        <button class="flex-1 rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-white shadow-soft hover:brightness-105">Download PDF</button>
+        <button class="flex-1 rounded-full border border-hair bg-white px-4 py-2.5 text-sm font-semibold text-navy hover:border-accent/50">Download Word</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Right: live resume preview (what prints) -->
+  <section class="order-1 flex justify-center lg:order-2">
+    <div class="rounded-xl bg-white shadow-lift">
+      <div class="mx-auto w-[520px] max-w-full p-10 text-navy">
+        <h2 class="font-display text-2xl font-bold">Alex Rivera</h2>
+        <p class="text-sm text-muted">alex.rivera@email.com &middot; Manchester, UK</p>
+        <hr class="my-4 border-hair" />
+        <p class="text-sm leading-relaxed text-navy">Reliable café team member with hands-on customer service and cash-handling experience, known for staying calm during busy periods.</p>
+
+        <h3 class="mt-6 text-xs font-semibold uppercase tracking-[0.15em] text-muted">Experience</h3>
+        <div class="mt-2">
+          <p class="text-sm font-semibold text-navy">Café Team Member <span class="font-normal text-muted">&middot; The Corner Café</span></p>
+          <ul class="mt-1 list-disc pl-5 text-sm text-navy">
+            <li>Served customers and handled payments during busy shifts</li>
+            <li>Restocked products and kept the counter tidy</li>
+            <li>Trained two new hires on the till</li>
+          </ul>
+        </div>
+
+        <h3 class="mt-6 text-xs font-semibold uppercase tracking-[0.15em] text-muted">Skills</h3>
+        <p class="mt-1 text-sm text-navy">Customer Service &middot; Cash Handling &middot; Teamwork</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="mx-auto max-w-6xl px-6 py-12 text-center text-xs text-muted">
+  Static mockup for rebrand reference &middot; Real UI: Next.js + React + Tailwind &middot; Edit tokens in the config block above to reskin.
+</footer>
+
+</body>
+</html>

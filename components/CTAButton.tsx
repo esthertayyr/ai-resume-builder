@@ -5,9 +5,9 @@ type Variant = "primary" | "secondary";
 
 const styles: Record<Variant, string> = {
   primary:
-    "bg-accent text-white shadow-soft hover:brightness-105 hover:shadow-lift",
+    "bg-accent text-white shadow-soft hover:brightness-105 hover:shadow-lift active:scale-[0.98]",
   secondary:
-    "bg-white text-navy ring-1 ring-hair hover:ring-accent/40 hover:shadow-soft",
+    "bg-white text-navy ring-1 ring-hair hover:ring-sky/50 hover:shadow-soft active:scale-[0.98]",
 };
 
 export function CTAButton({

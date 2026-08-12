@@ -193,7 +193,7 @@ export default function PreviewPage() {
             ) : (
               <div className="space-y-2">
                 <p className="rounded bg-sky/10 px-2 py-1.5 text-xs font-medium text-sky">
-                  ✨ We found some skills in what you told us. Confirm the ones that fit.
+                  ✦ We found some skills in what you told us. Confirm the ones that fit.
                 </p>
                 {skillOptions.map((s) => {
                   const on = pickedSkills.includes(s.text);

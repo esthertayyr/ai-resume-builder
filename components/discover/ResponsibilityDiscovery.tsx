@@ -278,8 +278,8 @@ export function ResponsibilityDiscovery({
           None of these
         </button>
         {count > 0 ? (
-          <span className="animate-pop text-sm font-semibold text-mint" aria-live="polite">
-            ✨ {count} confirmed
+          <span className="animate-pop label-mono text-mint" aria-live="polite">
+            ✦ {count} confirmed
           </span>
         ) : null}
       </div>

@@ -8,9 +8,14 @@ import type { ExperiencePath } from "@/lib/profile/types";
 interface PathChoice {
   id: ExperiencePath;
   icon: string;
+  code: string;
   title: string;
   description: string;
   button: string;
+  /** Per-card accent — subtle personality, not a rainbow. */
+  ring: string;
+  glow: string;
+  tab: string;
 }
 
 // Labels describe amount of GUIDANCE, not ability (never beginner/expert).
@@ -18,23 +23,35 @@ const CHOICES: PathChoice[] = [
   {
     id: "just_starting",
     icon: "🌱",
+    code: "Path / 01",
     title: "STARTING OUT",
-    description: "I've never made a resume before.",
+    description: "I've never made a resume.",
     button: "Guide me",
+    ring: "hover:border-mint/60 focus-visible:ring-mint",
+    glow: "bg-mint/10 text-mint",
+    tab: "bg-mint",
   },
   {
     id: "some_experience",
     icon: "🌿",
+    code: "Path / 02",
     title: "SOME EXPERIENCE",
-    description: "I've worked, studied, volunteered or done projects.",
+    description: "I've worked, studied, volunteered or built things.",
     button: "Help me build it",
+    ring: "hover:border-sky/60 focus-visible:ring-sky",
+    glow: "bg-sky/10 text-sky",
+    tab: "bg-sky",
   },
   {
     id: "experienced",
-    icon: "🚀",
+    icon: "⚡",
+    code: "Path / 03",
     title: "I KNOW MY STUFF",
-    description: "I already know my experience. I want to move quickly.",
+    description: "I want to move quickly.",
     button: "Let's go",
+    ring: "hover:border-accent/60 focus-visible:ring-accent",
+    glow: "bg-accent/10 text-accent",
+    tab: "bg-accent",
   },
 ];
 
@@ -83,14 +100,21 @@ function StartInner() {
               key={c.id}
               onClick={() => choose(c.id)}
               style={{ animationDelay: `${120 + i * 90}ms` }}
-              className={`animate-fade-up group flex flex-col rounded-3xl border bg-white p-7 text-left shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+              className={`animate-fade-up group relative flex flex-col overflow-hidden rounded-3xl border bg-white p-7 text-left shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift focus:outline-none focus-visible:ring-2 ${c.ring} ${
                 highlight ? "border-accent/50 ring-2 ring-accent/30" : "border-hair"
               }`}
             >
-              <span className="text-4xl">{c.icon}</span>
-              <span className="mt-5 text-sm font-semibold uppercase tracking-[0.15em] text-accent">{c.title}</span>
-              <span className="mt-2 flex-1 text-navy">{c.description}</span>
-              <span className="mt-6 inline-flex items-center gap-2 font-semibold text-accent">
+              {/* Colour tab — the card's personality */}
+              <span className={`absolute inset-x-0 top-0 h-1.5 ${c.tab}`} aria-hidden />
+              <span className="label-mono text-muted">{c.code}</span>
+              <span className={`mt-4 flex h-14 w-14 items-center justify-center rounded-2xl text-3xl ${c.glow}`}>
+                {c.icon}
+              </span>
+              <span className="mt-5 font-display text-sm font-bold uppercase tracking-[0.14em] text-navy">
+                {c.title}
+              </span>
+              <span className="mt-2 flex-1 text-muted">{c.description}</span>
+              <span className="mt-6 inline-flex items-center gap-2 font-semibold text-navy">
                 {c.button}
                 <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
               </span>

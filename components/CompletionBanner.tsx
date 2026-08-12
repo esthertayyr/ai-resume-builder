@@ -22,7 +22,7 @@ export function CompletionBanner({ profile }: { profile: MasterProfile }) {
 
   return (
     <div className="no-print overflow-hidden rounded-2xl border border-hair bg-gradient-to-br from-accent/10 via-white to-mint/10 p-5">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">Look what you built</p>
+      <p className="label-mono text-accent">Look what you built / ✦</p>
       <p className="mt-1 font-display text-xl font-bold text-navy animate-fade-up">
         This is your resume — from what you&apos;ve actually done.
       </p>
