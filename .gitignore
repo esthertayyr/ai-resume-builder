@@ -1,0 +1,32 @@
+# dependencies
+node_modules/
+
+# next.js build output
+.next/
+out/
+build/
+
+# environment / secrets — never commit real values
+.env
+.env*.local
+
+# vercel
+.vercel
+
+# generated / private user files (resumes, uploads)
+/generated/
+/uploads/
+
+# typescript / test / tooling
+*.tsbuildinfo
+next-env.d.ts
+coverage/
+
+# logs
+*.log
+npm-debug.log*
+
+# editor / OS
+.DS_Store
+.idea/
+.vscode/
