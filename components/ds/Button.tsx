@@ -15,7 +15,7 @@ const BASE =
   "focus-visible:outline-red";
 
 const VARIANTS: Record<Variant, string> = {
-  primary: "bg-red text-paper hover:bg-[#B02629] shadow-soft",
+  primary: "bg-red text-paper hover:bg-[#CC2E3A] shadow-soft",
   secondary: "bg-surface text-ink ring-1 ring-hair hover:ring-ink",
   ghost: "bg-transparent text-ink hover:text-red",
 };

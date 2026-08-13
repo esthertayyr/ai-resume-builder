@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FOOTER_COLUMNS, SOCIALS } from "@/lib/site";
+import { FOOTER_COLUMNS, SOCIALS, SUPPORT_URL } from "@/lib/site";
 
 // Site footer. Link columns + socials come from lib/site config. Social accounts
 // that don't exist yet render as plain text (no fake URLs).
@@ -37,7 +37,23 @@ export function SiteFooter() {
           <p className="text-sm text-muted">
             © {2026} The Annotated Career. Built to help people move forward.
           </p>
-          <ul className="flex items-center gap-5">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+            {SUPPORT_URL ? (
+              <a
+                href={SUPPORT_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-1.5 text-sm text-ink transition-colors hover:text-red"
+              >
+                <span aria-hidden className="text-red">
+                  ☕
+                </span>
+                <span className="underline decoration-transparent decoration-2 underline-offset-4 transition-colors group-hover:decoration-red">
+                  Buy me a coffee
+                </span>
+              </a>
+            ) : null}
+            <ul className="flex items-center gap-5">
             {SOCIALS.map((s) => (
               <li key={s.label} className="text-sm">
                 {s.url ? (
@@ -56,7 +72,8 @@ export function SiteFooter() {
                 )}
               </li>
             ))}
-          </ul>
+            </ul>
+          </div>
         </div>
       </div>
     </footer>

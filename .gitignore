@@ -17,6 +17,9 @@ build/
 /generated/
 /uploads/
 
+# image staging/source folder — assets live under public/assets once placed
+/incoming-images/
+
 # typescript / test / tooling
 *.tsbuildinfo
 next-env.d.ts

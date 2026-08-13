@@ -79,15 +79,14 @@ export const TOOLS: Tool[] = [
 ];
 
 /**
- * Support / donation link. Set to a real URL (e.g. Buy Me a Coffee) once the
- * account exists. Until then it's null and the UI shows a clearly-marked
- * "coming soon" state — never a fake payment link.
- * You can also override this at build time with NEXT_PUBLIC_SUPPORT_URL.
+ * Support / donation link — the project's real PayPal.Me page. This is a genuine
+ * destination (not a fake payment form); the UI links out to it in a new tab.
+ * Override at build time with NEXT_PUBLIC_SUPPORT_URL if needed.
  */
 export const SUPPORT_URL: string | null =
   process.env.NEXT_PUBLIC_SUPPORT_URL && process.env.NEXT_PUBLIC_SUPPORT_URL.length > 0
     ? process.env.NEXT_PUBLIC_SUPPORT_URL
-    : null;
+    : "https://paypal.me/Emikaeltyr";
 
 /** Social handles. `url: null` = account not created yet → rendered as a
  *  non-linked placeholder (no fake social URLs). */

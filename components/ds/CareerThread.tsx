@@ -40,7 +40,7 @@ export function CareerThread({ orientation = "vertical", className = "", length 
     return (
       <svg
         ref={ref}
-        className={`overflow-visible ${className}`}
+        className={`overflow-visible text-red ${className}`}
         width="100%"
         height="16"
         viewBox="0 0 240 16"
@@ -50,7 +50,7 @@ export function CareerThread({ orientation = "vertical", className = "", length 
       >
         <path
           d="M2 8 C 60 2, 120 14, 180 6 S 236 8, 238 8"
-          stroke="#C92F32"
+          stroke="currentColor"
           strokeWidth="2"
           strokeLinecap="round"
           strokeDasharray="320"
@@ -65,7 +65,7 @@ export function CareerThread({ orientation = "vertical", className = "", length 
   return (
     <svg
       ref={ref}
-      className={`mx-auto overflow-visible ${className}`}
+      className={`mx-auto overflow-visible text-red ${className}`}
       width="40"
       height={length}
       viewBox={`0 0 40 ${length}`}
@@ -74,7 +74,7 @@ export function CareerThread({ orientation = "vertical", className = "", length 
     >
       <path
         d={`M20 2 C 6 ${length * 0.3}, 34 ${length * 0.6}, 20 ${length - 2}`}
-        stroke="#C92F32"
+        stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
         strokeDasharray={length * 2}

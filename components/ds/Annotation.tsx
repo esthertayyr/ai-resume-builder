@@ -38,7 +38,7 @@ export function Underline({
     <span className={`relative inline-block ${className}`}>
       {children}
       <svg
-        className="pointer-events-none absolute -bottom-1 left-0 h-3 w-full overflow-visible"
+        className="pointer-events-none absolute -bottom-1 left-0 h-3 w-full overflow-visible text-red"
         viewBox="0 0 200 12"
         preserveAspectRatio="none"
         fill="none"
@@ -46,7 +46,7 @@ export function Underline({
       >
         <path
           d="M2 8 C 40 3, 80 11, 120 6 S 190 3, 198 7"
-          stroke="#C92F32"
+          stroke="currentColor"
           strokeWidth="3"
           strokeLinecap="round"
           className={animate ? "animate-draw" : undefined}
@@ -62,7 +62,7 @@ export function Underline({
 export function CircleMark({ className = "" }: { className?: string }) {
   return (
     <svg
-      className={`pointer-events-none absolute inset-0 h-full w-full overflow-visible ${className}`}
+      className={`pointer-events-none absolute inset-0 h-full w-full overflow-visible text-red ${className}`}
       viewBox="0 0 100 100"
       preserveAspectRatio="none"
       fill="none"
@@ -70,7 +70,7 @@ export function CircleMark({ className = "" }: { className?: string }) {
     >
       <path
         d="M50 6 C 82 6, 96 26, 94 52 C 92 82, 66 96, 44 94 C 16 92, 4 68, 8 42 C 12 18, 30 6, 54 8"
-        stroke="#C92F32"
+        stroke="currentColor"
         strokeWidth="2.5"
         strokeLinecap="round"
       />

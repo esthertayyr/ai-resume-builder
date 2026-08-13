@@ -11,12 +11,29 @@ export const aiTaskSchema = z.enum([
   "achievement_wording",
   "extract_resume",
   "cover_letter",
+  "look_closer",
+  "resume_review",
+  "job_match",
+  "interview_prep",
 ]);
 
 export const aiRequestSchema = z.object({
   task: aiTaskSchema,
   input: z.record(z.unknown()).default({}),
 });
+
+/**
+ * Total character budget of a request's `input`, measured on the serialized JSON. This
+ * is the hard cap that stops oversized resumes/prompts from ever reaching the model.
+ * (Kept in sync with AI_LIMITS.maxInputChars — imported by the route.)
+ */
+export function inputCharLength(input: unknown): number {
+  try {
+    return JSON.stringify(input ?? {}).length;
+  } catch {
+    return Number.POSITIVE_INFINITY;
+  }
+}
 
 export const aiSuggestionSchema = z.object({
   text: z.string().min(1),

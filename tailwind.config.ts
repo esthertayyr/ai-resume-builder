@@ -26,30 +26,36 @@ const config: Config = {
     },
     extend: {
       colors: {
-        // ---- New semantic palette (preferred for new work) ----
-        paper: "#FAFAF7", // primary background
+        // ---- Cool editorial palette (LOCKED brand system) ----
+        paper: "#F7F8FA", // primary background (cool paper)
         surface: "#FFFFFF", // cards / raised surfaces
-        ink: "#111111", // primary text / headings
-        red: "#C92F32", // Teacher Red — the signature accent
-        warmgray: "#F1F1EC", // neutral fill / section banding
-        // Optional supporting colours — never all at once.
-        blue: "#6E86A8",
-        sage: "#8DA18D",
-        lavender: "#9A8DB0",
-        ochre: "#C5A36A",
+        ink: "#111318", // primary text / headings / structure
+        red: "#E63946", // Signature / Teacher Red — the identity accent (used as a MARK, never a flood)
+        warmgray: "#EEF0F3", // neutral fill / section banding (name kept; now cool)
+        neutral: "#EEF0F3", // preferred name for the cool neutral fill
+        border: "#D9DDE3", // preferred name for hairline borders
+        // Blue is rare — possibility / future / next chapter only.
+        blue: "#3157D5",
+        "blue-soft": "#EAF0FF",
+        "pale-blue": "#EAF0FF",
+        // Retired warm supporting hues → collapsed to a quiet cool slate so no
+        // beige/green/ochre survives (brand forbids extra colours / rainbow).
+        sage: "#626872",
+        lavender: "#626872",
+        ochre: "#626872",
 
-        // ---- Legacy token names, remapped to the new palette ----
-        // (kept so /start, /discover, /interview, /preview keep working)
-        canvas: "#FAFAF7", // was cream → paper
-        navy: "#111111", // was navy → ink
-        accent: "#C92F32", // was coral → Teacher Red
+        // ---- Legacy token names, remapped to the cool palette ----
+        // (kept so /start, /discover, /interview, /preview keep compiling)
+        canvas: "#F7F8FA", // was cream → cool paper
+        navy: "#111318", // → ink
+        accent: "#E63946", // → Signature Red
         card: "#FFFFFF",
-        muted: "#5C5C57", // warm secondary text
-        hair: "#E3E0D8", // warm hairline border
-        sky: "#6E86A8", // → supporting blue
-        mint: "#8DA18D", // → supporting sage
-        sun: "#C5A36A", // → supporting ochre
-        coral: "#9A8DB0", // → supporting lavender
+        muted: "#626872", // cool secondary text
+        hair: "#D9DDE3", // cool hairline border
+        sky: "#3157D5", // → editorial blue
+        mint: "#626872", // → quiet slate
+        sun: "#626872", // → quiet slate (was ochre/yellow — banned)
+        coral: "#626872", // → quiet slate
       },
       fontFamily: {
         // Self-hosted via next/font (app/layout.tsx), exposed as CSS variables

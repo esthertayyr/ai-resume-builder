@@ -20,6 +20,14 @@ import {
   type StoredResume,
   type TemplateId,
 } from "@/lib/resume/store";
+import {
+  LookCloserAction,
+  ImproveBulletAction,
+  DiscoverSkillsAction,
+  WriteSummaryAction,
+  ReviewResumeAction,
+  JobMatchAction,
+} from "@/components/resume/ai/actions";
 
 // Editorial document editor: form/editor left, live preview right (desktop);
 // editor + a Preview tab on mobile. Reuses the shared render layer, so the
@@ -247,6 +255,31 @@ function Editor({ doc, onChange }: { doc: ResumeDocument; onChange: (d: ResumeDo
 
   const addSection = (section: ResumeSection) => onChange({ ...doc, sections: [...doc.sections, section] });
 
+  // Explicit-accept sink for AI suggestions: appends unique skills to the Skills
+  // section (creating it if absent). Never overwrites; case-insensitive de-dup.
+  const addSkills = (names: string[]) => {
+    const clean = names.map((n) => n.trim()).filter(Boolean);
+    if (!clean.length) return;
+    const sections = [...doc.sections];
+    let idx = sections.findIndex((s) => s.kind === "skills");
+    if (idx === -1) {
+      sections.push({ kind: "skills", heading: "Skills", items: [] });
+      idx = sections.length - 1;
+    }
+    const sec = sections[idx];
+    if (sec.kind !== "skills") return;
+    const seen = new Set(sec.items.map((x) => x.toLowerCase()));
+    const merged = [...sec.items];
+    for (const n of clean) {
+      if (!seen.has(n.toLowerCase())) {
+        merged.push(n);
+        seen.add(n.toLowerCase());
+      }
+    }
+    sections[idx] = { ...sec, items: merged };
+    onChange({ ...doc, sections });
+  };
+
   const presentKinds = new Set(doc.sections.map((s) => s.kind));
 
   return (
@@ -280,19 +313,23 @@ function Editor({ doc, onChange }: { doc: ResumeDocument; onChange: (d: ResumeDo
 
           <div className="mt-4">
             {section.kind === "summary" && (
-              <textarea
-                value={section.text}
-                onChange={(e) => setSection(i, { ...section, text: e.target.value })}
-                rows={4}
-                placeholder="A short, honest summary of who you are and what you're looking for."
-                className="w-full rounded-lg border border-hair bg-paper p-3 text-sm text-ink outline-none focus:border-red"
-              />
+              <>
+                <textarea
+                  value={section.text}
+                  onChange={(e) => setSection(i, { ...section, text: e.target.value })}
+                  rows={4}
+                  placeholder="A short, honest summary of who you are and what you're looking for."
+                  className="w-full rounded-lg border border-hair bg-paper p-3 text-sm text-ink outline-none focus:border-red"
+                />
+                <WriteSummaryAction doc={doc} onUse={(text) => setSection(i, { ...section, text })} />
+              </>
             )}
 
             {(section.kind === "experience" || section.kind === "projects") && (
               <ExperienceEditor
                 items={section.items}
                 onChange={(items) => setSection(i, { ...section, items })}
+                onAddSkills={addSkills}
               />
             )}
 
@@ -304,7 +341,10 @@ function Editor({ doc, onChange }: { doc: ResumeDocument; onChange: (d: ResumeDo
             )}
 
             {section.kind === "skills" && (
-              <ChipEditor items={section.items} onChange={(items) => setSection(i, { ...section, items })} />
+              <>
+                <ChipEditor items={section.items} onChange={(items) => setSection(i, { ...section, items })} />
+                <DiscoverSkillsAction doc={doc} onAddSkills={addSkills} />
+              </>
             )}
           </div>
         </div>
@@ -330,6 +370,21 @@ function Editor({ doc, onChange }: { doc: ResumeDocument; onChange: (d: ResumeDo
           )}
         </div>
       </div>
+
+      {/* Resume-level editor's read — never edits your resume, only reads it. */}
+      <div className="rounded-card border border-hair bg-surface p-5">
+        <p className="font-display text-lg font-semibold text-ink">Look closer at the whole thing</p>
+        <p className="mt-1 text-sm text-muted">
+          Two more sets of editor's eyes — a read of the whole resume, and a side-by-side with a job you're eyeing.
+          Neither one changes a word without you.
+        </p>
+        <div className="mt-4 space-y-5">
+          <ReviewResumeAction doc={doc} />
+          <div className="border-t border-hair pt-5">
+            <JobMatchAction doc={doc} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -337,9 +392,11 @@ function Editor({ doc, onChange }: { doc: ResumeDocument; onChange: (d: ResumeDo
 function ExperienceEditor({
   items,
   onChange,
+  onAddSkills,
 }: {
   items: ExperienceItem[];
   onChange: (items: ExperienceItem[]) => void;
+  onAddSkills: (names: string[]) => void;
 }) {
   const set = (idx: number, patch: Partial<ExperienceItem>) =>
     onChange(items.map((it, i) => (i === idx ? { ...it, ...patch } : it)));
@@ -361,6 +418,7 @@ function ExperienceEditor({
             <Field label="Location" value={it.location ?? ""} onChange={(v) => set(idx, { location: v })} />
           </div>
           <BulletEditor bullets={it.bullets} onChange={(bullets) => set(idx, { bullets })} />
+          <LookCloserAction item={it} onAddSkills={onAddSkills} />
           <div className="mt-2 flex justify-end gap-2 text-sm">
             <button type="button" className="text-muted hover:text-ink" onClick={() => move(idx, -1)}>
               ↑
@@ -422,19 +480,27 @@ function BulletEditor({ bullets, onChange }: { bullets: string[]; onChange: (b: 
   return (
     <div className="mt-2 space-y-2">
       {bullets.map((b, i) => (
-        <div key={i} className="flex items-center gap-2">
-          <span className="text-red" aria-hidden>
-            •
-          </span>
-          <input
-            value={b}
-            aria-label={`Bullet ${i + 1}`}
-            onChange={(e) => onChange(bullets.map((x, idx) => (idx === i ? e.target.value : x)))}
-            className="flex-1 rounded border border-hair bg-surface px-2 py-1 text-sm text-ink outline-none focus:border-red"
-          />
-          <button type="button" className="text-muted hover:text-red" onClick={() => onChange(bullets.filter((_, idx) => idx !== i))}>
-            ×
-          </button>
+        <div key={i}>
+          <div className="flex items-center gap-2">
+            <span className="text-red" aria-hidden>
+              •
+            </span>
+            <input
+              value={b}
+              aria-label={`Bullet ${i + 1}`}
+              onChange={(e) => onChange(bullets.map((x, idx) => (idx === i ? e.target.value : x)))}
+              className="flex-1 rounded border border-hair bg-surface px-2 py-1 text-sm text-ink outline-none focus:border-red"
+            />
+            <button type="button" className="text-muted hover:text-red" onClick={() => onChange(bullets.filter((_, idx) => idx !== i))}>
+              ×
+            </button>
+          </div>
+          <div className="ml-5 mt-1">
+            <ImproveBulletAction
+              value={b}
+              onUse={(text) => onChange(bullets.map((x, idx) => (idx === i ? text : x)))}
+            />
+          </div>
         </div>
       ))}
       <AddBtn onClick={() => onChange([...bullets, ""])}>+ Add bullet</AddBtn>

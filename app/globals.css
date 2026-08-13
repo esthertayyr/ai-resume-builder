@@ -8,19 +8,23 @@
    Tailwind tokens; keep the two in sync.
    ============================================================ */
 :root {
-  /* Palette */
-  --paper: #fafaf7;
+  /* Palette — cool editorial (LOCKED brand system) */
+  --paper: #f7f8fa;
   --surface: #ffffff;
-  --ink: #111111;
-  --red: #c92f32; /* Teacher Red — signature accent */
-  --warmgray: #f1f1ec;
-  --hair: #e3e0d8;
-  --muted: #5c5c57;
-  /* Optional supporting (never all together) */
-  --blue: #6e86a8;
-  --sage: #8da18d;
-  --lavender: #9a8db0;
-  --ochre: #c5a36a;
+  --ink: #111318;
+  --red: #e63946; /* Signature / Teacher Red — the identity accent */
+  --warmgray: #eef0f3; /* cool neutral fill */
+  --neutral: #eef0f3;
+  --hair: #d9dde3; /* cool hairline border */
+  --border: #d9dde3;
+  --muted: #626872;
+  /* Blue is rare — possibility / future only */
+  --blue: #3157d5;
+  --blue-soft: #eaf0ff;
+  /* Retired warm supporting hues → quiet cool slate */
+  --sage: #626872;
+  --lavender: #626872;
+  --ochre: #626872;
 
   /* Design tokens */
   --radius-card: 1rem;
@@ -42,7 +46,7 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Editorial paper background — barely-there warmth, no sci-fi wash. */
+/* Editorial paper background — crisp cool white, no warm wash. */
 .paper-bg {
   position: relative;
   isolation: isolate;

@@ -20,9 +20,109 @@ export class MockAIProvider implements AIProvider {
         return { suggestions: [] };
       case "cover_letter":
         return { suggestions: this.coverLetter(req.input) };
+      case "look_closer":
+        return { suggestions: this.lookCloser(req.input) };
+      case "resume_review":
+        return { suggestions: this.review(req.input) };
+      case "job_match":
+        return { suggestions: this.jobMatch(req.input) };
+      case "interview_prep":
+        return { suggestions: this.interview(req.input) };
       default:
         return { suggestions: [] };
     }
+  }
+
+  // ---- LOOK CLOSER: analyse a single experience entry. Evidence-first: every finding
+  // quotes the user's own words. No numbers, teams, or achievements are invented. ----
+  private lookCloser(input: Record<string, unknown>): AISuggestion[] {
+    const text = String(input.text ?? "").trim();
+    if (text.length < 12) return []; // route/UI turns "empty" into a friendly nudge
+    const rules = SKILL_RULES;
+    const out: AISuggestion[] = [];
+    for (const { skill, match, why } of rules) {
+      const m = text.match(match);
+      if (m && !out.some((o) => o.text === skill)) {
+        out.push({
+          text: skill,
+          rationale: quoteEvidence(text, m.index ?? 0),
+          meta: { kind: "finding", explanation: why, confidence: "medium" },
+        });
+      }
+    }
+    return out.slice(0, 5);
+  }
+
+  // ---- REVIEW: editorial pass over the flattened resume text. Groups findings; never
+  // rewrites. Deterministic heuristics stand in for the model when offline. ----
+  private review(input: Record<string, unknown>): AISuggestion[] {
+    const sections = (input.sections as { section: string; lines: string[] }[] | undefined) ?? [];
+    const summary = String(input.summary ?? "").trim();
+    const out: AISuggestion[] = [];
+    const add = (category: string, section: string, issue: string, suggestion: string, priority: string) =>
+      out.push({ text: issue, rationale: suggestion, meta: { category, section, priority } });
+
+    if (!summary) {
+      add("needs_evidence", "Summary", "No professional summary yet.", "Add 1–2 lines framing who you are and what you're aiming for.", "medium");
+    } else if (summary.length < 40) {
+      add("look_closer", "Summary", "The summary is very short.", "Add the strengths your experience already shows.", "low");
+    }
+
+    for (const s of sections) {
+      const joined = s.lines.join(" ").toLowerCase();
+      const vague = s.lines.filter((l) => /helped|worked|stuff|things|various|responsible for/i.test(l));
+      if (vague.length) {
+        add("look_closer", s.section, `Some wording is vague (e.g. "${vague[0].slice(0, 60)}").`, "Say what you actually did — the specific action counts.", "medium");
+      }
+      if (/customer|served|client/.test(joined)) {
+        add("already_strong", s.section, "Clear customer-facing evidence here.", "This is a strength — keep it prominent.", "low");
+      }
+      const longLine = s.lines.find((l) => l.length > 220);
+      if (longLine) add("optional_improvement", s.section, "One description is quite long.", "Consider splitting it into two tighter bullets.", "low");
+    }
+    if (!sections.length && !summary) {
+      add("needs_evidence", "Resume", "There isn't much to look at yet.", "Add an experience or two — even small roles count.", "high");
+    }
+    return out;
+  }
+
+  // ---- JOB MATCH: compare confirmed resume evidence against a job description. Only
+  // claims a match when the resume text supports it; gaps are stated, never faked. ----
+  private jobMatch(input: Record<string, unknown>): AISuggestion[] {
+    const jd = String(input.jobText ?? "").toLowerCase();
+    const evidence = ((input.evidence as string[] | undefined) ?? []).map((e) => e.trim()).filter(Boolean);
+    const evJoined = evidence.join(" • ").toLowerCase();
+    const out: AISuggestion[] = [];
+
+    for (const { skill, match } of SKILL_RULES) {
+      const wanted = match.test(jd);
+      const shown = evidence.find((e) => match.test(e));
+      if (wanted && shown) out.push({ text: skill, rationale: shown, meta: { group: "strongMatches" } });
+      else if (wanted && !shown && evJoined) out.push({ text: skill, rationale: "Not clearly evidenced in your resume yet.", meta: { group: "possibleGaps" } });
+    }
+    const soft = evidence.filter((e) => /helped|assisted|involved|part of/i.test(e))[0];
+    if (soft) out.push({ text: "Relevant experience to sharpen", rationale: soft, meta: { group: "lookCloser" } });
+    out.push({
+      text: out.some((o) => o.meta?.group === "possibleGaps")
+        ? "Address the gaps above with concrete examples if you have them."
+        : "Mirror the job's language where your real evidence already fits.",
+      meta: { group: "suggestions" },
+    });
+    return out;
+  }
+
+  // ---- INTERVIEW PREP: questions rooted in the user's own resume text. ----
+  private interview(input: Record<string, unknown>): AISuggestion[] {
+    const evidence = ((input.evidence as string[] | undefined) ?? []).map((e) => e.trim()).filter(Boolean);
+    const out: AISuggestion[] = [];
+    for (const e of evidence.slice(0, 4)) {
+      out.push({ text: `Tell me more about when you ${lowerFirst(stripLead(e))}.`, meta: { group: "questions" } });
+    }
+    if (!out.length) out.push({ text: "Walk me through your most recent role.", meta: { group: "questions" } });
+    out.push({ text: "Prepare a 60-second version of your story using your real experience.", meta: { group: "preparationPoints" } });
+    out.push({ text: "Be ready to explain any gaps or short roles honestly.", meta: { group: "clarifications" } });
+    out.push({ text: "What does success look like in this role in the first 90 days?", meta: { group: "candidateQuestions" } });
+    return out;
   }
 
   // ---- Cover letter: a STRUCTURED DRAFT built only from what the user gave us.
@@ -119,28 +219,24 @@ export class MockAIProvider implements AIProvider {
 
   // ---- Prompt 10: skills evidenced by confirmed responsibilities/activities ----
   private skills(input: Record<string, unknown>): AISuggestion[] {
+    // Accept both the legacy `confirmedStatements` and the richer source-tagged form.
     const statements = (input.confirmedStatements as string[] | undefined) ?? [];
-    const rules: { skill: string; match: RegExp }[] = [
-      { skill: "Customer Service", match: /customer|served|enquir|client/i },
-      { skill: "Communication", match: /email|phone|answer|greet|communicat/i },
-      { skill: "Teamwork", match: /team|colleague|help(ed)? |support/i },
-      { skill: "Time Management", match: /busy|deadline|on time|schedule|shift/i },
-      { skill: "Calendar Management", match: /calendar|appointment|booking|meeting/i },
-      { skill: "Microsoft Excel", match: /spreadsheet|excel/i },
-      { skill: "Data Entry", match: /record|data|spreadsheet|file/i },
-      { skill: "Cash Handling", match: /cash|payment|till|checkout/i },
-      { skill: "Organization", match: /organiz|tidy|file|arrang/i },
+    const tagged = (input.evidence as { text: string; source?: string }[] | undefined) ?? [];
+    const items: { text: string; source: string }[] = [
+      ...statements.map((t) => ({ text: t, source: "experience" })),
+      ...tagged.map((e) => ({ text: e.text, source: e.source ?? "experience" })),
     ];
-    const found = new Map<string, string>(); // skill -> evidence statement
-    for (const s of statements) {
-      for (const { skill, match } of rules) {
-        if (match.test(s) && !found.has(skill)) found.set(skill, s);
+    const found = new Map<string, { evidence: string; source: string }>();
+    for (const it of items) {
+      for (const { skill, match } of SKILL_RULES) {
+        if (match.test(it.text) && !found.has(skill)) found.set(skill, { evidence: it.text, source: it.source });
       }
     }
     // Evidence-backed only — do not inflate (Prompt 10).
-    return [...found.entries()].map(([skill, evidence]) => ({
+    return [...found.entries()].map(([skill, { evidence, source }]) => ({
       text: skill,
-      rationale: `Suggested because you mentioned "${evidence}"`,
+      rationale: evidence,
+      meta: { source, confidence: "medium" },
     }));
   }
 
@@ -178,3 +274,37 @@ export class MockAIProvider implements AIProvider {
 function capitalize(s: string): string {
   return s.length ? s[0].toUpperCase() + s.slice(1) : s;
 }
+
+function lowerFirst(s: string): string {
+  return s.length ? s[0].toLowerCase() + s.slice(1) : s;
+}
+
+// Strip a leading first-person verb so "Served customers" -> "served customers"
+// reads naturally inside a question. Purely cosmetic; no facts change.
+function stripLead(s: string): string {
+  return s.replace(/^(i\s+|we\s+)/i, "").trim();
+}
+
+// Quote a short window of the user's own text as evidence — never paraphrased into a
+// claim the user didn't make.
+function quoteEvidence(text: string, at: number): string {
+  const start = Math.max(0, at - 0);
+  const slice = text.slice(start, start + 90).trim();
+  return slice.length < text.length ? `${slice}…` : slice;
+}
+
+// One evidence-rule table shared by skill discovery, look-closer and job match, so all
+// three surfaces agree on what counts as evidence. `why` explains the connection.
+const SKILL_RULES: { skill: string; match: RegExp; why: string }[] = [
+  { skill: "Customer Service", match: /customer|served|serving|enquir|client|guest/i, why: "Direct interaction with customers." },
+  { skill: "Communication", match: /email|phone|answer|greet|communicat|explain|liais/i, why: "Regular communication with people." },
+  { skill: "Teamwork", match: /team|colleague|coworker|help(ed|ing)?|support|collaborat/i, why: "Working alongside or supporting others." },
+  { skill: "Training & Mentoring", match: /train(ed|ing)?|mentor|onboard|show(ed)? new|taught/i, why: "Helping others learn the role." },
+  { skill: "Time Management", match: /busy|deadline|on time|schedule|shift|fast[- ]paced|prioriti/i, why: "Working under time pressure." },
+  { skill: "Cash Handling", match: /cash|payment|till|checkout|transaction|register/i, why: "Handling money or payments." },
+  { skill: "Calendar Management", match: /calendar|appointment|booking|meeting|diary/i, why: "Coordinating time and appointments." },
+  { skill: "Microsoft Excel", match: /spreadsheet|excel/i, why: "Working with spreadsheets." },
+  { skill: "Data Entry", match: /record|data|spreadsheet|file|logg(ed|ing)/i, why: "Recording or entering information." },
+  { skill: "Organization", match: /organiz|tidy|file|arrang|stock|inventory/i, why: "Keeping things ordered." },
+  { skill: "Problem Solving", match: /resolv|fix|troublesho|handled (a )?(issue|problem|complaint)/i, why: "Resolving issues as they came up." },
+];

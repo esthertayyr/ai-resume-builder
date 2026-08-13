@@ -1,5 +1,5 @@
 // ============================================================================
-// Career Quest — website image asset manifest (single source of truth).
+// The Annotated Career — website image asset manifest (single source of truth).
 //
 // Art direction: "The Annotated Career" — bright editorial magazine + hand-drawn
 // notebook annotation + human photography. Bright, clean, editorial, human,
@@ -94,6 +94,36 @@ export const ASSETS: AssetSpec[] = [
     priority: "critical",
     loading: "eager",
   }),
+  // Second artwork-only hero scene (A/B). Same negative-space zone as the primary
+  // so the fixed HTML headline + CTA sit correctly over either. Loaded WITHOUT
+  // priority (the SSR default is the primary; B is chosen client-side).
+  A({
+    id: "hero-desktop-b",
+    file: "/assets/hero/hero-desktop-b.jpg",
+    section: "hero",
+    purpose:
+      "Alternate desktop hero scene for random-on-load A/B. MUST share the primary's negative-space zone (left / lower third) so the fixed HTML headline + CTA still fit.",
+    size: "heroDesktop",
+    desktop: true,
+    mobile: false,
+    alt: "A person at a bright desk writing notes — warm, editorial, hopeful.",
+    transparent: false,
+    priority: "high",
+    loading: "lazy",
+  }),
+  A({
+    id: "hero-mobile-b",
+    file: "/assets/hero/hero-mobile-b.jpg",
+    section: "hero",
+    purpose: "Alternate portrait hero scene for random-on-load A/B. Same negative-space zone as the primary mobile poster.",
+    size: "heroMobile",
+    desktop: false,
+    mobile: true,
+    alt: "A person at a bright desk writing notes — warm, editorial, hopeful.",
+    transparent: false,
+    priority: "high",
+    loading: "lazy",
+  }),
 
   // ---- WHO IS THIS FOR (situation categories, hand-drawn icons) -----------
   ...(
@@ -159,6 +189,49 @@ export const ASSETS: AssetSpec[] = [
     alt: "A hand writing in a notebook with a pen, seen close up.",
     transparent: false,
     priority: "high",
+    loading: "lazy",
+  }),
+
+  // ---- EDITORIAL CHAPTERS (story photography: evidence → future) ----------
+  A({
+    id: "editorial-evidence",
+    file: "/assets/editorial/evidence.jpg",
+    section: "that-counts",
+    purpose:
+      "Editorial 'evidence' chapter: documents / notes / desk objects that read as proof inside ordinary experience. Calm areas accept red annotation.",
+    size: "editorialFeature",
+    desktop: true,
+    mobile: true,
+    alt: "Papers and notes spread on a desk, examined closely.",
+    transparent: false,
+    priority: "medium",
+    loading: "lazy",
+  }),
+  A({
+    id: "editorial-next-move",
+    file: "/assets/editorial/next-move.jpg",
+    section: "that-counts",
+    purpose: "Final cinematic 'next move / future' chapter image. Landscape, leaves space for closing headline.",
+    size: "editorialLandscape",
+    desktop: true,
+    mobile: true,
+    alt: "A person looking ahead — the next chapter of a career.",
+    transparent: false,
+    priority: "medium",
+    loading: "lazy",
+  }),
+  A({
+    id: "annotation-poster",
+    file: "/assets/editorial/annotation-poster.jpg",
+    section: "that-counts",
+    purpose:
+      "Pure annotation poster — a portrait editorial spread of the Career Thread + red marks over experience. Usable as a full-bleed campaign chapter.",
+    size: "editorialPortrait",
+    desktop: true,
+    mobile: true,
+    alt: "An annotated career page — red marks connecting moments of experience.",
+    transparent: false,
+    priority: "low",
     loading: "lazy",
   }),
 
@@ -235,7 +308,7 @@ export const ASSETS: AssetSpec[] = [
     size: "openGraph",
     desktop: true,
     mobile: true,
-    alt: "Career Quest — you've done more.",
+    alt: "The Annotated Career — you've done more than you think.",
     transparent: false,
     priority: "low",
     loading: "lazy",
