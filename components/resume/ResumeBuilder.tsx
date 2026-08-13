@@ -12,7 +12,7 @@ import type {
   ResumeDocument,
   ResumeSection,
 } from "@/lib/render/contract";
-import { downloadDocx, downloadPdf } from "@/lib/export";
+import { DownloadPanel } from "@/components/resume/DownloadPanel";
 import {
   loadResumes,
   makeId,
@@ -35,11 +35,16 @@ import {
 // preview is byte-for-byte what DOCX/PDF export produce. All three templates are
 // single-column and ATS-safe.
 
-// Display names per the brief; ids map to the proven render templates.
+// Six ATS-safe templates. Each id maps to a real TemplateDefinition in
+// lib/render/templates.ts (distinct typographic tokens) — switching only changes
+// how the same content is typeset; it never edits resume data or calls the AI.
 const TEMPLATE_CHOICES: { id: TemplateId; label: string; note?: string }[] = [
-  { id: "clean", label: "Clean ATS", note: "Best for applicant tracking systems" },
-  { id: "modern", label: "Editorial", note: "A little more brand personality" },
-  { id: "executive", label: "Classic", note: "Refined serif" },
+  { id: "clean", label: "Clean ATS", note: "Neutral and safe for any applicant tracking system" },
+  { id: "minimal", label: "Minimal", note: "No rules, tight spacing — all focus on the words" },
+  { id: "modern", label: "Modern", note: "Contemporary, roomy, restrained indigo accent" },
+  { id: "editorial", label: "Editorial", note: "The Annotated Career voice — serif with signature red" },
+  { id: "executive", label: "Executive", note: "Centered refined serif for senior roles" },
+  { id: "creative", label: "Creative", note: "Centered and airy with a cool teal accent" },
 ];
 
 type Tab = "edit" | "preview";
@@ -189,12 +194,6 @@ export function ResumeBuilder({ variant = "standard" }: { variant?: "standard" |
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <Button size="md" onClick={() => downloadDocx(active.doc, template, active.paper)}>
-            Download .docx
-          </Button>
-          <Button size="md" variant="secondary" onClick={() => downloadPdf()}>
-            Download PDF (print)
-          </Button>
           {/* Mobile tab switch */}
           <div className="ml-auto flex rounded-lg border border-hair p-1 lg:hidden">
             {(["edit", "preview"] as Tab[]).map((t) => (
@@ -212,6 +211,11 @@ export function ResumeBuilder({ variant = "standard" }: { variant?: "standard" |
             ))}
           </div>
         </div>
+      </div>
+
+      {/* The close: download panel (byte-for-byte the preview, template-aware). */}
+      <div className="mt-6">
+        <DownloadPanel doc={active.doc} template={template} paper={active.paper} />
       </div>
 
       {/* Editor + preview */}

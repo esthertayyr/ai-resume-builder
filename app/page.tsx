@@ -13,8 +13,9 @@ import { organizationJsonLd } from "@/lib/seo";
 // HOMEPAGE — The Annotated Career
 // A visual story, not a SaaS landing page:
 // PROBLEM → LOOK CLOSER → DISCOVER → REVEAL SKILLS → BUILD → RESUME → PREPARE → NEXT MOVE
-// Repeated sections are data-driven; layout uses the DS primitives. Images are
-// production-ready placeholders at the exact intended aspect ratios.
+// Repeated sections are data-driven; layout uses the DS primitives. Images resolve
+// from the asset manifest by id (hero, that-counts, resume, next-move, step + who
+// icons), so ratio/alt/priority stay consistent and there's no layout shift.
 // ============================================================================
 
 const EXPERIENCES = [
@@ -30,32 +31,34 @@ const EXPERIENCES = [
 const SKILLS_FROM_JOB = ["Customer Service", "Communication", "Time Management", "Problem Solving"];
 
 const STEPS = [
-  { n: "01", title: "Tell us what you've done", copy: "Jobs, projects, volunteering, life — in your own words." },
-  { n: "02", title: "Discover your skills", copy: "We reveal the real skills hidden inside those experiences." },
-  { n: "03", title: "Build your story", copy: "Turn experiences into clear, structured career stories." },
-  { n: "04", title: "Create your resume", copy: "A professional resume, built from what's actually yours." },
-  { n: "05", title: "Prepare for opportunities", copy: "Practise interviews and applications with confidence." },
-  { n: "06", title: "Make your next move", copy: "Clear, recommended next steps toward your goal." },
+  { n: "01", icon: "how-experience", title: "Tell us what you've done", copy: "Jobs, projects, volunteering, life — in your own words." },
+  { n: "02", icon: "how-discover-skills", title: "Discover your skills", copy: "We reveal the real skills hidden inside those experiences." },
+  { n: "03", icon: "how-skills", title: "Build your story", copy: "Turn experiences into clear, structured career stories." },
+  { n: "04", icon: "how-resume", title: "Create your resume", copy: "A professional resume, built from what's actually yours." },
+  { n: "05", icon: "how-interview", title: "Prepare for opportunities", copy: "Practise interviews and applications with confidence." },
+  { n: "06", icon: "how-next-move", title: "Make your next move", copy: "Clear, recommended next steps toward your goal." },
 ];
 
+// Aligned to the five approved "who is this for" icons in the asset manifest.
 const SITUATIONS = [
-  "Starting out",
-  "Changing careers",
-  "Returning to work",
-  "Applying for internships",
-  "Looking for remote work",
-  "Ready for your next move",
+  { icon: "who-starting-out", label: "Starting out" },
+  { icon: "who-changing-careers", label: "Changing careers" },
+  { icon: "who-next-step", label: "Ready for your next step" },
+  { icon: "who-own-path", label: "Building your own path" },
+  { icon: "who-wanting-more", label: "Wanting more" },
 ];
 
+// Each href resolves to a real published guide under /resources/[category]/[slug]
+// (see lib/resources/content.ts). No links to routes that don't exist.
 const RESOURCES = [
-  { title: "Interview Preparation", href: "/interview" },
-  { title: "ATS Resume Guide", href: "/resume/ats" },
-  { title: "First Resume Guide", href: "/resume/first-resume" },
-  { title: "Internship Resume Guide", href: "/resume/internship" },
-  { title: "Job Search Guide", href: "/job-search" },
-  { title: "Application Email Guide", href: "/job-search/application-email" },
-  { title: "Salary / Hourly Rate Guide", href: "/job-search/salary" },
-  { title: "Remote Work / VA Guide", href: "/remote-work" },
+  { title: "Your first resume, step by step", href: "/resources/resumes/first-resume" },
+  { title: "Discover the skills you already have", href: "/resources/career-stories/discover-skills" },
+  { title: "Changing careers: making your past count", href: "/resources/career-stories/career-change" },
+  { title: "Interview preparation that actually helps", href: "/resources/interviews/interview-prep" },
+  { title: "What actually counts as experience", href: "/resources/career-stories/what-counts-as-experience" },
+  { title: "What is an ATS, and why care?", href: "/resources/ats/what-is-an-ats" },
+  { title: "A job application email that gets read", href: "/resources/applications/job-application-email" },
+  { title: "Finding remote work when starting out", href: "/resources/remote-work/finding-remote-work" },
 ];
 
 export default function HomePage() {
@@ -69,8 +72,7 @@ export default function HomePage() {
           <div className="absolute inset-0 -z-10">
             <div className="hidden h-full md:block">
               <EditorialImage
-                ratio="16:9"
-                alt="A person at a bright desk, writing and reviewing notes — warm and hopeful."
+                assetId="hero-desktop"
                 priority
                 sizes="100vw"
                 className="h-full rounded-none border-0"
@@ -79,8 +81,7 @@ export default function HomePage() {
             </div>
             <div className="h-full md:hidden">
               <EditorialImage
-                ratio="4:5"
-                alt="A person at a bright desk, writing and reviewing notes — warm and hopeful."
+                assetId="hero-mobile"
                 priority
                 sizes="100vw"
                 className="h-full rounded-none border-0"
@@ -148,8 +149,7 @@ export default function HomePage() {
           <div className="grid items-center gap-10 lg:grid-cols-2">
             <div className="relative">
               <EditorialImage
-                ratio="1:1"
-                alt="A hand writing in a notebook with a pen, seen close up."
+                assetId="that-counts-closeup"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
             </div>
@@ -188,7 +188,7 @@ export default function HomePage() {
             {STEPS.map((step, i) => (
               <Reveal key={step.n} delay={(i % 3) * 80} className="rounded-card border border-hair bg-surface p-6">
                 <div className="flex items-center justify-between">
-                  <HandDrawnIcon alt={step.title} size={48} />
+                  <HandDrawnIcon assetId={step.icon} size={48} />
                   <span className="label-mono text-red">{step.n}</span>
                 </div>
                 <h3 className="mt-5 font-display text-xl font-semibold text-ink">{step.title}</h3>
@@ -211,11 +211,11 @@ export default function HomePage() {
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {SITUATIONS.map((s) => (
               <div
-                key={s}
+                key={s.label}
                 className="flex items-center gap-4 rounded-card border border-hair bg-surface p-5"
               >
-                <HandDrawnIcon alt={s} size={40} />
-                <span className="text-lg font-medium text-ink">{s}</span>
+                <HandDrawnIcon assetId={s.icon} size={40} />
+                <span className="text-lg font-medium text-ink">{s.label}</span>
               </div>
             ))}
           </div>
@@ -254,8 +254,7 @@ export default function HomePage() {
               </div>
             </div>
             <EditorialImage
-              ratio="4:3"
-              alt="A printed resume on a desk, with sections marked up by hand in red."
+              assetId="resume-mockup"
               sizes="(max-width: 1024px) 100vw, 50vw"
             />
           </div>
@@ -319,8 +318,7 @@ export default function HomePage() {
         <section className="relative isolate overflow-hidden">
           <div className="absolute inset-0 -z-10">
             <EditorialImage
-              ratio="16:9"
-              alt="An open road at golden hour — a hopeful next step."
+              assetId="editorial-next-move"
               sizes="100vw"
               className="h-full rounded-none border-0"
             />

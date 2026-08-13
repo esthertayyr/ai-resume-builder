@@ -73,7 +73,7 @@ export interface ResumeDocument {
 export type PaperSize = "A4" | "Letter";
 
 export interface TemplateDefinition {
-  id: "clean" | "modern" | "executive";
+  id: "clean" | "modern" | "executive" | "minimal" | "editorial" | "creative";
   name: string;
   description: string;
   /** Heading casing — all standard ATS-safe words either way. */
