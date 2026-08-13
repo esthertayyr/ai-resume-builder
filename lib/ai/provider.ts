@@ -8,7 +8,8 @@ export type AITaskType =
   | "skills_discovery"
   | "summary_options"
   | "achievement_wording"
-  | "extract_resume";
+  | "extract_resume"
+  | "cover_letter";
 
 export interface AIRequest {
   task: AITaskType;

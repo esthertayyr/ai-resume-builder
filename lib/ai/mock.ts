@@ -18,9 +18,47 @@ export class MockAIProvider implements AIProvider {
         return { suggestions: this.achievement(req.input) };
       case "extract_resume":
         return { suggestions: [] };
+      case "cover_letter":
+        return { suggestions: this.coverLetter(req.input) };
       default:
         return { suggestions: [] };
     }
+  }
+
+  // ---- Cover letter: a STRUCTURED DRAFT built only from what the user gave us.
+  // Each suggestion is one paragraph (meta.part labels it). No invented company
+  // facts, metrics, or claims — the user edits everything before it's real. ----
+  private coverLetter(input: Record<string, unknown>): AISuggestion[] {
+    const role = String(input.role ?? "").trim();
+    const company = String(input.company ?? "").trim();
+    const name = String(input.name ?? "").trim();
+    const strengths = ((input.strengths as string[] | undefined) ?? [])
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const motivation = String(input.motivation ?? "").trim();
+
+    const roleText = role || "the role";
+    const companyText = company || "your team";
+    const strengthList =
+      strengths.length >= 2
+        ? `${strengths.slice(0, -1).join(", ")} and ${strengths[strengths.length - 1]}`
+        : strengths[0] ?? "";
+
+    const opening = company
+      ? `I'm writing to apply for ${roleText} at ${company}. ${motivation || `The role stood out to me, and I'd welcome the chance to contribute.`}`
+      : `I'm writing to apply for ${roleText}. ${motivation || `The role stood out to me, and I'd welcome the chance to contribute.`}`;
+
+    const body = strengthList
+      ? `In my experience I've built strengths in ${strengthList}. I try to bring these to everything I take on, and I believe they line up well with what ${companyText} is looking for.`
+      : `I bring a reliable, willing-to-learn approach to my work, and I'd put that to use for ${companyText} from day one.`;
+
+    const closing = `Thank you for considering my application. I'd be glad to talk through how I could help ${companyText}, and I'm available at your convenience.${name ? `\n\nSincerely,\n${name}` : ""}`;
+
+    return [
+      { text: opening, meta: { part: "Opening" }, rationale: "Uses the role and company you entered." },
+      { text: body, meta: { part: "Body" }, rationale: strengthList ? "Built from the strengths you listed." : "A neutral starting point — edit it to reflect your real strengths." },
+      { text: closing, meta: { part: "Closing" } },
+    ];
   }
 
   // ---- Prompt 5/6: role-appropriate responsibility suggestions ----

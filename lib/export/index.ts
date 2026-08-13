@@ -2,7 +2,6 @@
 
 import { saveAs } from "file-saver";
 import type { PaperSize, ResumeDocument, TemplateDefinition } from "@/lib/render/contract";
-import { buildDocxBlob } from "./docx";
 
 function safeFileName(doc: ResumeDocument): string {
   const base = (doc.contact.name ?? "resume").trim().replace(/[^\w\s-]/g, "").replace(/\s+/g, "_");
@@ -15,6 +14,9 @@ export async function downloadDocx(
   template: TemplateDefinition,
   paper: PaperSize = "A4",
 ): Promise<void> {
+  // Load the (heavy) docx library only when the user actually exports, so it
+  // stays out of the builder/preview initial bundle.
+  const { buildDocxBlob } = await import("./docx");
   const blob = await buildDocxBlob(doc, template, paper);
   saveAs(blob, `${safeFileName(doc)}.docx`);
 }

@@ -10,6 +10,7 @@ export const aiTaskSchema = z.enum([
   "summary_options",
   "achievement_wording",
   "extract_resume",
+  "cover_letter",
 ]);
 
 export const aiRequestSchema = z.object({

@@ -1,33 +1,73 @@
 import type { Metadata, Viewport } from "next";
+import { Fraunces, Inter, Caveat, DM_Mono } from "next/font/google";
 import "./globals.css";
 
+// Self-hosted via next/font: no render-blocking <link>, automatic preloading,
+// and font-display: swap with size-adjust to prevent layout shift. Each font is
+// exposed as a CSS variable the design system reads (see globals.css / Tailwind).
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-ui",
+  display: "swap",
+});
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-display",
+  display: "swap",
+});
+const caveat = Caveat({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-hand",
+  display: "swap",
+});
+const dmMono = DM_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-mono",
+  display: "swap",
+});
+
+// Brand-level default metadata. Per-page metadata (Phase 12) overrides title +
+// description via the App Router `metadata` export on each route.
 export const metadata: Metadata = {
-  title: "Career Quest — you've done more",
+  metadataBase: new URL("https://theannotatedcareer.com"),
+  title: {
+    default: "The Annotated Career — you've done more than you think",
+    template: "%s · The Annotated Career",
+  },
   description:
-    "Everything you've done counts. Tell us what you've done, and we'll help you turn it into a professional resume. AI suggests. You confirm.",
+    "You have more experience than you realize. We annotate your real experiences, reveal the skills inside them, and help turn them into stronger resumes, cover letters, and next steps.",
+  openGraph: {
+    type: "website",
+    siteName: "The Annotated Career",
+    title: "The Annotated Career — you've done more than you think",
+    description:
+      "We annotate your real experiences, reveal the skills inside them, and help turn them into stronger career materials.",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#FFF9F2",
+  themeColor: "#FAFAF7",
   width: "device-width",
   initialScale: 1,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <head>
-        {/* Fonts loaded with graceful fallback to system fonts if offline.
-            Display: Plus Jakarta Sans · Body: Inter · Technical labels: DM Mono */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap"
-          rel="stylesheet"
-        />
-        <style>{`:root{--font-ui:"Inter";--font-display:"Plus Jakarta Sans";--font-mono:"DM Mono";}`}</style>
-      </head>
-      <body className="adventure-bg min-h-screen antialiased">{children}</body>
+    <html
+      lang="en"
+      className={`${inter.variable} ${fraunces.variable} ${caveat.variable} ${dmMono.variable}`}
+    >
+      <body className="paper-bg min-h-screen antialiased">
+        <a href="#main" className="skip-link">
+          Skip to content
+        </a>
+        {children}
+      </body>
     </html>
   );
 }
