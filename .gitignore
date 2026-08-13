@@ -33,3 +33,6 @@ npm-debug.log*
 .DS_Store
 .idea/
 .vscode/
+
+# Generated UI bundle for sharing (not source)
+UI-SNAPSHOT.md

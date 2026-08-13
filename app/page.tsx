@@ -71,12 +71,12 @@ export default function HomePage() {
       <SiteHeader />
       <main id="main">
         {/* 01 — HERO ---------------------------------------------------------- */}
-        <section className="relative isolate flex min-h-[92vh] items-center overflow-hidden pt-16">
+        <section className="relative isolate flex min-h-[92vh] items-start overflow-hidden pt-16">
           {/* Cinematic editorial visual (placeholder at final ratios). */}
           <div className="absolute inset-0 -z-10">
             <div className="hidden h-full md:block">
               <EditorialImage
-                assetId="hero-desktop"
+                assetId="hero-desktop-b"
                 priority
                 sizes="100vw"
                 className="h-full rounded-none border-0"
@@ -85,18 +85,23 @@ export default function HomePage() {
             </div>
             <div className="h-full md:hidden">
               <EditorialImage
-                assetId="hero-mobile"
+                assetId="hero-mobile-b"
                 priority
                 sizes="100vw"
                 className="h-full rounded-none border-0"
               />
             </div>
-            {/* Legibility scrim for overlaid type (works over the final photo). */}
-            <div className="absolute inset-0 bg-gradient-to-t from-paper via-paper/70 to-paper/20" aria-hidden />
+            {/* Legibility scrim anchored to the TOP-LEFT (where the HTML headline
+                sits), fading to transparent toward the bottom-right so the artwork's
+                own hand-drawn words on the desk stay visible instead of being washed
+                out to paper. */}
+            <div className="absolute inset-0 bg-gradient-to-br from-paper/85 via-paper/30 to-transparent" aria-hidden />
           </div>
 
-          <div className="mx-auto w-full max-w-content px-5 py-20 md:px-8">
-            <div className="max-w-3xl">
+          <div className="mx-auto w-full max-w-content px-5 pb-20 pt-10 md:px-8 md:pt-14">
+            {/* Anchored top-left in the clean negative space; narrower so it never
+                reaches the figure/annotations on the right. */}
+            <div className="max-w-xl">
               <Eyebrow number="01">Real people. Real experiences.</Eyebrow>
               <h1 className="mt-5 font-display text-display-xl font-semibold text-ink">
                 You've done{" "}
