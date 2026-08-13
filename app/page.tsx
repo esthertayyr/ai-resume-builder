@@ -39,13 +39,17 @@ const STEPS = [
   { n: "06", icon: "how-next-move", title: "Make your next move", copy: "Clear, recommended next steps toward your goal." },
 ];
 
-// Aligned to the five approved "who is this for" icons in the asset manifest.
+// Every audience we speak to. Rendered as connected pills (the Career Thread
+// motif used elsewhere on the page) rather than an icon-per-item grid, so the
+// list isn't capped by the five approved "who" icons — no audience gets dropped
+// and no icon has to be faked or duplicated.
 const SITUATIONS = [
-  { icon: "who-starting-out", label: "Starting out" },
-  { icon: "who-changing-careers", label: "Changing careers" },
-  { icon: "who-next-step", label: "Ready for your next step" },
-  { icon: "who-own-path", label: "Building your own path" },
-  { icon: "who-wanting-more", label: "Wanting more" },
+  "Starting out",
+  "Changing careers",
+  "Returning to work",
+  "Applying for internships",
+  "Looking for remote work",
+  "Ready for your next move",
 ];
 
 // Each href resolves to a real published guide under /resources/[category]/[slug]
@@ -208,17 +212,19 @@ export default function HomePage() {
               Wherever you are right now.
             </Heading>
           </div>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {SITUATIONS.map((s) => (
-              <div
-                key={s.label}
-                className="flex items-center gap-4 rounded-card border border-hair bg-surface p-5"
-              >
-                <HandDrawnIcon assetId={s.icon} size={40} />
-                <span className="text-lg font-medium text-ink">{s.label}</span>
-              </div>
+          <div className="mt-10 flex flex-wrap items-center gap-3">
+            {SITUATIONS.map((s, i) => (
+              <span key={s} className="flex items-center gap-3">
+                <span className="rounded-pill border border-hair bg-surface px-4 py-2 text-sm font-medium text-ink">
+                  {s}
+                </span>
+                {i < SITUATIONS.length - 1 && (
+                  <span className="hidden h-px w-6 bg-red/40 sm:inline-block" aria-hidden />
+                )}
+              </span>
             ))}
           </div>
+          <p className="hand mt-6 text-2xl text-red">…wherever you are, you're welcome here.</p>
         </Section>
 
         {/* 06 — RESUME TRANSFORMATION ---------------------------------------- */}
