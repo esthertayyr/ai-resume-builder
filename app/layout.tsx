@@ -40,14 +40,16 @@ export const metadata: Metadata = {
   },
   description:
     "You have more experience than you realize. We annotate your real experiences, reveal the skills inside them, and help turn them into stronger resumes, cover letters, and next steps.",
+  icons: { icon: "/favicon.png", shortcut: "/favicon.png", apple: "/favicon.png" },
   openGraph: {
     type: "website",
     siteName: "The Annotated Career",
     title: "The Annotated Career — you've done more than you think",
     description:
       "We annotate your real experiences, reveal the skills inside them, and help turn them into stronger career materials.",
+    images: [{ url: "/assets/og/og-default.png", width: 1200, height: 630, alt: "The Annotated Career — you've done more than you think." }],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: { card: "summary_large_image", images: ["/assets/og/og-default.png"] },
 };
 
 export const viewport: Viewport = {

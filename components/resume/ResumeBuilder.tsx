@@ -5,6 +5,7 @@ import { Button } from "@/components/ds";
 import { RenderedResume } from "@/lib/render/RenderedResume";
 import { TEMPLATES } from "@/lib/render/templates";
 import type {
+  CertificationItem,
   EducationItem,
   ExperienceItem,
   PaperSize,
@@ -346,6 +347,14 @@ function Editor({ doc, onChange }: { doc: ResumeDocument; onChange: (d: ResumeDo
                 <DiscoverSkillsAction doc={doc} onAddSkills={addSkills} />
               </>
             )}
+
+            {section.kind === "certifications" && (
+              <CertificationsEditor
+                items={section.items}
+                onChange={(items) => setSection(i, { ...section, items })}
+                onAddSkills={addSkills}
+              />
+            )}
           </div>
         </div>
       ))}
@@ -367,6 +376,11 @@ function Editor({ doc, onChange }: { doc: ResumeDocument; onChange: (d: ResumeDo
           <AddBtn onClick={() => addSection({ kind: "education", heading: "Education", items: [] })}>Education</AddBtn>
           {!presentKinds.has("skills") && (
             <AddBtn onClick={() => addSection({ kind: "skills", heading: "Skills", items: [] })}>Skills</AddBtn>
+          )}
+          {!presentKinds.has("certifications") && (
+            <AddBtn onClick={() => addSection({ kind: "certifications", heading: "Certifications & Licenses", items: [] })}>
+              Certifications
+            </AddBtn>
           )}
         </div>
       </div>
@@ -472,6 +486,143 @@ function EducationEditor({
         </div>
       ))}
       <AddBtn onClick={() => onChange([...items, { credential: "", bullets: [] }])}>+ Add entry</AddBtn>
+    </div>
+  );
+}
+
+function CertificationsEditor({
+  items,
+  onChange,
+  onAddSkills,
+}: {
+  items: CertificationItem[];
+  onChange: (items: CertificationItem[]) => void;
+  onAddSkills: (names: string[]) => void;
+}) {
+  const set = (idx: number, patch: Partial<CertificationItem>) =>
+    onChange(items.map((it, i) => (i === idx ? { ...it, ...patch } : it)));
+  return (
+    <div className="space-y-4">
+      {items.map((it, idx) => {
+        // ISO "YYYY-MM" sorts chronologically, so a plain string compare validates order.
+        const dateError = !it.doesNotExpire && !!it.issueDate && !!it.expiryDate && it.expiryDate < it.issueDate;
+        return (
+          <div key={idx} className="rounded-lg border border-hair bg-paper p-3">
+            <div className="grid gap-2 sm:grid-cols-2">
+              <Field label="Name" value={it.name} onChange={(v) => set(idx, { name: v })} />
+              <Field
+                label="Issuing organization"
+                value={it.issuingOrganization ?? ""}
+                onChange={(v) => set(idx, { issuingOrganization: v })}
+              />
+              <Field
+                label="Credential ID (optional)"
+                value={it.credentialNumber ?? ""}
+                onChange={(v) => set(idx, { credentialNumber: v })}
+              />
+              <Field
+                label="Verification URL (optional)"
+                value={it.verificationUrl ?? ""}
+                onChange={(v) => set(idx, { verificationUrl: v })}
+              />
+              <MonthField label="Issued" value={it.issueDate ?? ""} onChange={(v) => set(idx, { issueDate: v })} />
+              <MonthField
+                label="Expires"
+                value={it.expiryDate ?? ""}
+                disabled={it.doesNotExpire}
+                onChange={(v) => set(idx, { expiryDate: v })}
+              />
+            </div>
+            <label className="mt-2 flex items-center gap-2 text-sm text-ink">
+              <input
+                type="checkbox"
+                checked={!!it.doesNotExpire}
+                onChange={(e) => set(idx, { doesNotExpire: e.target.checked, ...(e.target.checked ? { expiryDate: "" } : {}) })}
+              />
+              This credential does not expire
+            </label>
+            {dateError && (
+              <p className="mt-1 text-sm text-red" role="alert">
+                Expiry date can’t be before the issue date.
+              </p>
+            )}
+            <div className="mt-2">
+              <label className="label-mono block text-muted">Description (optional)</label>
+              <textarea
+                value={it.description ?? ""}
+                onChange={(e) => set(idx, { description: e.target.value })}
+                rows={2}
+                className="mt-1 w-full rounded-lg border border-hair bg-surface p-2 text-sm text-ink outline-none focus:border-red"
+              />
+            </div>
+            <div className="mt-2">
+              <label className="label-mono block text-muted">Related skills (comma-separated, optional)</label>
+              <div className="mt-1 flex gap-2">
+                <input
+                  value={(it.relatedSkills ?? []).join(", ")}
+                  onChange={(e) =>
+                    set(idx, {
+                      relatedSkills: e.target.value
+                        .split(",")
+                        .map((s) => s.trim())
+                        .filter(Boolean),
+                    })
+                  }
+                  className="flex-1 rounded-lg border border-hair bg-surface px-3 py-2 text-sm text-ink outline-none focus:border-red"
+                />
+                {(it.relatedSkills?.length ?? 0) > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => onAddSkills(it.relatedSkills ?? [])}
+                    className="whitespace-nowrap rounded-lg border border-red px-3 text-sm text-red transition hover:bg-red hover:text-paper"
+                  >
+                    Add to Skills
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="mt-2 text-right">
+              <button
+                type="button"
+                className="text-sm text-muted hover:text-red"
+                onClick={() => onChange(items.filter((_, i) => i !== idx))}
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        );
+      })}
+      <AddBtn onClick={() => onChange([...items, { name: "" }])}>+ Add certification</AddBtn>
+    </div>
+  );
+}
+
+function MonthField({
+  label,
+  value,
+  onChange,
+  disabled,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  disabled?: boolean;
+}) {
+  const id = useMemo(() => `m-${label.replace(/\s+/g, "-").toLowerCase()}-${makeId().slice(0, 4)}`, [label]);
+  return (
+    <div>
+      <label htmlFor={id} className="label-mono block text-muted">
+        {label}
+      </label>
+      <input
+        id={id}
+        type="month"
+        value={value}
+        disabled={disabled}
+        onChange={(e) => onChange(e.target.value)}
+        className="mt-1 w-full rounded-lg border border-hair bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-red disabled:opacity-50"
+      />
     </div>
   );
 }

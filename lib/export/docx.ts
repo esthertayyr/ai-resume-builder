@@ -72,6 +72,11 @@ export async function buildDocxBlob(
           spacing: { after: 40 },
           children: [new TextRun({ text: line.text, size: 21, font })],
         });
+      case "note":
+        return new Paragraph({
+          spacing: { after: 20 },
+          children: [new TextRun({ text: line.text, size: 18, font, color: "6B7280" })],
+        });
       case "paragraph":
       case "inline":
       default:

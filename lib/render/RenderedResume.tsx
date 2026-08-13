@@ -122,6 +122,12 @@ export function RenderedResume({
                 {line.text}
               </div>
             );
+          case "note":
+            return (
+              <div key={i} style={{ marginTop: 2, color: "#6b7280", fontSize: "9.5pt" }}>
+                {line.text}
+              </div>
+            );
           default:
             return null;
         }

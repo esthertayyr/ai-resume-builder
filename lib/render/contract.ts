@@ -34,12 +34,33 @@ export interface EducationItem {
   bullets: string[];
 }
 
+// A certification / licence. Only `name` is required; every other field renders
+// ONLY when the user filled it in. Nothing here is ever invented by the app or the
+// AI — dates, credential numbers, and issuers come from the user alone.
+export interface CertificationItem {
+  name: string;
+  issuingOrganization?: string;
+  /** Optional ID/number exactly as issued. Never generated. */
+  credentialNumber?: string;
+  /** "YYYY-MM" (from a month picker) or free text; formatted for display. */
+  issueDate?: string;
+  /** "YYYY-MM" or free text. Ignored when doesNotExpire is true. */
+  expiryDate?: string;
+  /** When true, the credential has no expiry and expiryDate is not shown. */
+  doesNotExpire?: boolean;
+  verificationUrl?: string;
+  description?: string;
+  /** Skills this credential evidences (user-confirmed; feeds the Skills section). */
+  relatedSkills?: string[];
+}
+
 export type ResumeSection =
   | { kind: "summary"; heading: string; text: string }
   | { kind: "experience"; heading: string; items: ExperienceItem[] }
   | { kind: "projects"; heading: string; items: ExperienceItem[] }
   | { kind: "education"; heading: string; items: EducationItem[] }
-  | { kind: "skills"; heading: string; items: string[] };
+  | { kind: "skills"; heading: string; items: string[] }
+  | { kind: "certifications"; heading: string; items: CertificationItem[] };
 
 export interface ResumeDocument {
   contact: ContactInfo;
@@ -79,7 +100,19 @@ export type DocLine =
   | { type: "subheading"; text: string; meta?: string }
   | { type: "bullet"; text: string }
   | { type: "paragraph"; text: string }
-  | { type: "inline"; text: string };
+  | { type: "inline"; text: string }
+  | { type: "note"; text: string };
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+/** "2024-01" -> "Jan 2024". Leaves human/free-text values (e.g. "Jan 2024") as-is. */
+export function formatMonth(v?: string): string {
+  if (!v) return "";
+  const m = /^(\d{4})-(\d{2})$/.exec(v.trim());
+  if (!m) return v.trim();
+  const mi = parseInt(m[2], 10) - 1;
+  return mi >= 0 && mi < 12 ? `${MONTHS[mi]} ${m[1]}` : v.trim();
+}
 
 export function flatten(doc: ResumeDocument): DocLine[] {
   const lines: DocLine[] = [];
@@ -127,6 +160,34 @@ export function flatten(doc: ResumeDocument): DocLine[] {
           lines.push({ type: "inline", text: section.items.join("  •  ") });
         }
         break;
+      case "certifications": {
+        const shown = section.items.filter((it) => it.name.trim());
+        if (shown.length) {
+          lines.push({ type: "heading", text: section.heading });
+          for (const it of shown) {
+            const dateText = it.doesNotExpire
+              ? [formatMonth(it.issueDate) && `Issued ${formatMonth(it.issueDate)}`, "No expiry"]
+                  .filter(Boolean)
+                  .join(" · ")
+              : [
+                  formatMonth(it.issueDate) && `Issued ${formatMonth(it.issueDate)}`,
+                  formatMonth(it.expiryDate) && `Expires ${formatMonth(it.expiryDate)}`,
+                ]
+                  .filter(Boolean)
+                  .join(" · ");
+            const meta = [it.issuingOrganization?.trim(), dateText].filter(Boolean).join(" · ");
+            lines.push({ type: "subheading", text: it.name.trim(), meta: meta || undefined });
+            if (it.credentialNumber?.trim())
+              lines.push({ type: "note", text: `Credential ID: ${it.credentialNumber.trim()}` });
+            if (it.description?.trim()) lines.push({ type: "note", text: it.description.trim() });
+            if (it.relatedSkills?.length)
+              lines.push({ type: "note", text: `Related skills: ${it.relatedSkills.join(", ")}` });
+            if (it.verificationUrl?.trim())
+              lines.push({ type: "note", text: `Verify: ${it.verificationUrl.trim()}` });
+          }
+        }
+        break;
+      }
     }
   }
   return lines;

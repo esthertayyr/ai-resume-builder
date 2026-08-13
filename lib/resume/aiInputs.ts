@@ -32,6 +32,14 @@ export function resumeEvidence(doc: ResumeDocument): Evidence[] {
           for (const b of it.bullets) if (b.trim()) out.push({ text: `${head}: ${b.trim()}`, source: "education" });
         }
         break;
+      case "certifications":
+        // Name + issuer + description only. Credential numbers and verification URLs
+        // are PII-adjacent and NEVER sent to the model.
+        for (const it of s.items) {
+          const text = itemText([it.name, it.issuingOrganization, it.description]);
+          if (text) out.push({ text, source: "certification" });
+        }
+        break;
       // summary/skills are AI OUTPUTS, not evidence — never fed back in as facts.
       default:
         break;
@@ -64,6 +72,11 @@ export function reviewSections(doc: ResumeDocument): { section: string; lines: s
       }
     } else if (s.kind === "skills") {
       if (s.items.length) lines.push(`Skills: ${s.items.join(", ")}`);
+    } else if (s.kind === "certifications") {
+      for (const it of s.items) {
+        const head = itemText([it.name, it.issuingOrganization]);
+        if (head) lines.push(head);
+      }
     }
     if (lines.length) groups.push({ section: s.heading || s.kind, lines });
   }
